@@ -1,0 +1,15 @@
+.footer {
+    background-color: #111122;
+    color: #FFFFFF;
+    padding: 15px;
+    padding-bottom: 5px;
+    font-size: 12px;
+}
+
+.footer a{
+    color: #8888FF;
+}
+
+.bodyContainer{
+    min-height: 600px;   
+}

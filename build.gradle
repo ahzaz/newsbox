@@ -1,0 +1,116 @@
+//plugins {
+//    id "com.moowork.gulp" version "1.1.1"
+//}
+group 'com.ahzaz.java'
+version '0.2'
+
+
+
+apply plugin: 'java'
+apply plugin: 'idea'
+
+sourceCompatibility = 1.8
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    /****************** Jetty dependency **************** */
+    compile 'org.eclipse.jetty:jetty-server:9.3.7.RC1'
+    compile 'org.eclipse.jetty:jetty-webapp:9.3.7.RC1'
+
+    /****************** Spring dependency **************** */
+
+    /*
+        jackson is required to convert response properly.
+        otherwise it throws exception:
+        No converter found for return value of type: <Type>
+     */
+    compile 'com.fasterxml.jackson.core:jackson-core:2.4.1'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.4.1.1'
+    compile 'org.springframework:spring-webmvc:4.2.2.RELEASE'
+    compile 'org.springframework:spring-orm:4.2.2.RELEASE'
+    compile 'org.springframework:spring-core:4.2.2.RELEASE'
+    compile 'org.springframework:spring-web:4.2.2.RELEASE'
+    compile 'org.springframework:spring-context-support:4.2.2.RELEASE'
+
+    compile 'org.springframework.security:spring-security-web:4.0.2.RELEASE'
+    compile 'org.springframework.security:spring-security-config:4.0.2.RELEASE'
+
+    /****************** Freemarker dependency **************** */
+    compile 'org.freemarker:freemarker:2.3.23'
+
+    /****************** Hibernate dependency **************** */
+
+    compile 'org.hibernate:hibernate-core:5.0.0.Final'
+    compile 'mysql:mysql-connector-java:6.0.2'
+//    compile 'commons-dbcp:commons-dbcp:1.4'
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2
+    compile 'org.apache.commons:commons-dbcp2:2.1.1'
+    compile 'org.javassist:javassist:3.20.0-GA'
+
+    /****************** Logging dependency **************** */
+    compile 'log4j:log4j:1.2.17'
+    compile 'org.slf4j:slf4j-log4j12:1.7.21'
+
+    /****************** Scrapping dependency **************** */
+    // https://mvnrepository.com/artifact/org.jsoup/jsoup
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.10.2'
+
+    /****************** Facebook dependency **************** */
+    compile 'org.apache.httpcomponents:httpclient:4.5.3'
+
+
+
+    /****************** Test dependency **************** */
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+task copyRuntimeLibs(type: Copy) {
+    from configurations.runtime
+    into "$buildDir/libs/"
+
+}
+
+task setupZip(type: Zip) {
+    baseName = 'newsbox'
+    from(fileTree("src/main/").matching { include "resources/**/*" }) {
+        into '/'
+    }
+    from fileTree("$buildDir/libs/") {
+        into 'jars'
+    }
+}
+
+task zipWithoutLibs(type: Zip) {
+    baseName = 'newsbox'
+    from(fileTree("src/main/").matching { include "resources/**/*" }) {
+        into '/'
+    }
+    from(fileTree("$buildDir/libs/").matching { include "newsbox*.jar" }) {
+        into 'jars'
+    }
+}
+
+
+task setupResourceZip(type: Zip) {
+    baseName = 'resources'
+    from(fileTree("src/main/").matching { include "resources/**/*" }) {
+        into '/'
+    }
+}
+jar {
+    excludes = ["webapp", '*.*']
+}
+
+//gulp_build.dependsOn 'npmInstall'
+//gulp_build.dependsOn 'installGulp'
+//processResources.dependsOn gulp_build
+
+//setupResourceZip.dependsOn(gulp_build)
+build.dependsOn(copyRuntimeLibs)
+//build.dependsOn(zipWithoutLibs)
+build.dependsOn(setupZip)
+//build.dependsOn(setupResourceZip)
